@@ -9,6 +9,11 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// // Ensure uploads directory exists
+// if (!file_exists('uploads')) {
+//     mkdir('uploads', 0777, true);
+// }
+
 // Fetch tasks including shared tasks
 $todos = $pdo->prepare("SELECT * FROM tasks WHERE user_id = ? OR id IN (SELECT task_id FROM task_shares WHERE user_id = ?)");
 $todos->execute([$user_id, $user_id]);
@@ -30,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             move_uploaded_file($_FILES['attachment']['tmp_name'], $attachment);
         }
 
-        $stmt = $stmt = $pdo->prepare("INSERT INTO tasks (user_id, title, priority, due_date, description, category, subtasks, tags, attachment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO tasks (user_id, title, priority, due_date, description, category, subtasks, tags, attachment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$user_id, $todo, $priority, $due_date, $description, $category, $subtasks, $tags, $attachment]);
     } elseif (isset($_POST['delete'])) {
         $id = $_POST['id'];
@@ -80,6 +85,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Task shared successfully!";
         } else {
             echo "User with email $share_email not found.";
+        }
+    } elseif (isset($_POST['set_theme'])) {
+        $theme = $_POST['theme'];
+        $_SESSION['theme'] = $theme;
+
+        if (isset($_FILES['background_image']) && $_FILES['background_image']['error'] == 0) {
+            $background_image = 'uploads/' . time() . '_' . $_FILES['background_image']['name'];
+            move_uploaded_file($_FILES['background_image']['tmp_name'], $background_image);
+            $_SESSION['background_image'] = $background_image;
         }
     }
     header('Location: index.php');
@@ -155,6 +169,23 @@ if ($sort == 'due_date_asc') {
             <button type="submit" class="btn btn-primary">Apply</button>
         </form>
 
+        <div class="settings-form mt-5">
+        <form method="POST" action="" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="theme">Choose Theme:</label>
+                <select name="theme" id="theme" class="form-control">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="background_image">Upload Background Image:</label>
+                <input type="file" name="background_image" id="background_image" class="form-control-file">
+            </div>
+            <button type="submit" name="apply_settings" class="btn btn-primary">Apply Settings</button>
+        </form>
+    </div>
+
         <ul class="list-group">
             <?php foreach ($filtered_todos as $todo): ?>
                 <li class="list-group-item <?php echo $todo['completed'] ? 'completed' : ''; ?>">
@@ -219,7 +250,6 @@ if ($sort == 'due_date_asc') {
                 </div>
             <?php endforeach; ?>
         </ul>
-
 
         <!-- Add Modal -->
         <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addModal">Add Task</button>

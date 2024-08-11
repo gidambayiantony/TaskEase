@@ -27,6 +27,25 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    // Handle theme change
+    document.getElementById('theme').addEventListener('change', function() {
+        const theme = this.value;
+        document.body.classList.remove('light', 'dark');
+        document.body.classList.add(theme);
+    });
+
+    // Handle background image upload
+    document.getElementById('background_image').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.body.style.backgroundImage = `url(${e.target.result})`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     // Drag and Drop for reordering
     $('#todo-list').sortable({
         update: function(event, ui) {
