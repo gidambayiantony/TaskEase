@@ -9,10 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// // Ensure uploads directory exists
-// if (!file_exists('uploads')) {
-//     mkdir('uploads', 0777, true);
-// }
+// Ensure uploads directory exists
+if (!file_exists('uploads')) {
+    mkdir('uploads', 0777, true);
+}
 
 // Fetch tasks including shared tasks
 $todos = $pdo->prepare("SELECT * FROM tasks WHERE user_id = ? OR id IN (SELECT task_id FROM task_shares WHERE user_id = ?)");
@@ -125,6 +125,7 @@ if ($sort == 'due_date_asc') {
 ?>
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -169,22 +170,16 @@ if ($sort == 'due_date_asc') {
             <button type="submit" class="btn btn-primary">Apply</button>
         </form>
 
-        <div class="settings-form mt-5">
-        <form method="POST" action="" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="theme">Choose Theme:</label>
-                <select name="theme" id="theme" class="form-control">
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="background_image">Upload Background Image:</label>
-                <input type="file" name="background_image" id="background_image" class="form-control-file">
-            </div>
+        <form method="POST" action="" enctype="multipart/form-data" class="mb-4">
+            <label for="theme">Choose Theme:</label>
+            <select name="theme" id="theme" class="form-control mr-2">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+            <label for="background_image">Upload Background Image:</label>
+            <input type="file" name="background_image" id="background_image" class="form-control-file">
             <button type="submit" name="apply_settings" class="btn btn-primary">Apply Settings</button>
         </form>
-    </div>
 
         <ul class="list-group">
             <?php foreach ($filtered_todos as $todo): ?>
