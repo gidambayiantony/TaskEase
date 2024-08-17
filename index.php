@@ -9,10 +9,24 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Ensure uploads directory exists
-if (!file_exists('uploads')) {
-    mkdir('uploads', 0777, true);
+
+// Check if it's the user's first login
+$is_first_login = false;
+$stmt = $pdo->prepare("SELECT first_login FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch();
+
+if ($user && $user['first_login'] == 1) {
+    $is_first_login = true;
+    // Update the first_login field to 0 so the modal doesn't show again
+    $stmt = $pdo->prepare("UPDATE users SET first_login = 0 WHERE id = ?");
+    $stmt->execute([$user_id]);
 }
+
+// // Ensure uploads directory exists
+// if (!file_exists('uploads')) {
+//     mkdir('uploads', 0777, true);
+// }
 
 // Fetch tasks including shared tasks
 $todos = $pdo->prepare("SELECT * FROM tasks WHERE user_id = ? OR id IN (SELECT task_id FROM task_shares WHERE user_id = ?)");
@@ -125,7 +139,6 @@ if ($sort == 'due_date_asc') {
 ?>
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,6 +160,35 @@ if ($sort == 'due_date_asc') {
                 <input type="submit" value="Logout" class="btn btn-primary">
             </form>
         </div>
+
+         <!-- Onboarding Modal -->
+         <?php if ($is_first_login): ?>
+        <div class="modal fade" id="onboardingModal" tabindex="-1" role="dialog" aria-labelledby="onboardingModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="onboardingModalLabel">Welcome to TaskEase!</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Welcome to TaskEase, your new personal task manager! Here are a few things you can do:</p>
+                        <ul>
+                            <li>Add tasks with different priorities, categories, and tags.</li>
+                            <li>Set due dates and manage subtasks.</li>
+                            <li>Share tasks with your team and track progress.</li>
+                        </ul>
+                        <p>Get started by adding your first task!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+        
 
         <form class="form-inline mb-4">
             <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" class="form-control mr-2" placeholder="Search todos">
@@ -170,16 +212,23 @@ if ($sort == 'due_date_asc') {
             <button type="submit" class="btn btn-primary">Apply</button>
         </form>
 
-        <form method="POST" action="" enctype="multipart/form-data" class="mb-4">
+        <div class="settings-form mt-5">
+    <form method="POST" action="" enctype="multipart/form-data">
+        <div class="form-group">
             <label for="theme">Choose Theme:</label>
-            <select name="theme" id="theme" class="form-control mr-2">
+            <select name="theme" id="theme" class="form-control">
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
             </select>
+        </div>
+        <div class="form-group">
             <label for="background_image">Upload Background Image:</label>
             <input type="file" name="background_image" id="background_image" class="form-control-file">
-            <button type="submit" name="apply_settings" class="btn btn-primary">Apply Settings</button>
-        </form>
+        </div>
+        <button type="submit" name="apply_settings" class="btn btn-primary">Apply Settings</button>
+    </form>
+</div>
+
 
         <ul class="list-group">
             <?php foreach ($filtered_todos as $todo): ?>
@@ -208,6 +257,14 @@ if ($sort == 'due_date_asc') {
                             <input type="email" name="share_email" class="form-control-sm mr-2" placeholder="User Email" required>
                             <button type="submit" name="share" class="btn btn-sm btn-info">Share</button>
                         </form>
+
+                        <!-- Social Sharing Buttons -->
+                        <div class="d-inline-block">
+                        <a href="https://www.instagram.com/?url=http://yourwebsite.com/task.php?id=<?php echo $todo['id']; ?>" target="_blank" class="btn btn-sm btn-danger"><i class="fab fa-instagram"></i></a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=http://yourwebsite.com/task.php?id=<?php echo $todo['id']; ?>" target="_blank" class="btn btn-sm btn-primary"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://twitter.com/intent/tweet?text=Check out this task: http://yourwebsite.com/task.php?id=<?php echo $todo['id']; ?>" target="_blank" class="btn btn-sm btn-info"><i class="fab fa-twitter"></i></a>
+                            <a href="mailto:?subject=Check out this task&body=Here is the task link: http://yourwebsite.com/task.php?id=<?php echo $todo['id']; ?>" target="_blank" class="btn btn-sm btn-secondary"><i class="fas fa-envelope"></i></a>
+                        </div>
                     </div>
                 </li>
 
@@ -283,5 +340,13 @@ if ($sort == 'due_date_asc') {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="script.js"></script>
+
+    <?php if ($is_first_login): ?>
+    <script>
+        $(document).ready(function() {
+            $('#onboardingModal').modal('show');
+        });
+    </script>
+    <?php endif; ?>
 </body>
 </html>
