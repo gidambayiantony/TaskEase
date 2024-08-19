@@ -25,10 +25,10 @@ TaskEase is a comprehensive task management application designed to help users s
 ## Installation
 
 ### Prerequisites
-
 - PHP 7.4 or higher
 - Composer
 - MySQL
+- PHP Extensions: `pdo_mysql`, `mbstring`
 
 1. **Clone the repository:**
     ```bash
@@ -42,14 +42,20 @@ TaskEase is a comprehensive task management application designed to help users s
     ```
 
 3. **Configure the database:**
-    - Create a `.env` file and add your database configuration.
+    - Create a `.env` file with the following content:
+      ```env
+      DB_HOST=127.0.0.1
+      DB_NAME=todolist
+      DB_USER=root
+      DB_PASS=
+      ```
     - Run the database migrations:
       ```bash
       php migrate.php
       ```
 
 4. **Configure OAuth providers:**
-    - Create an `oauth_config.php` file with your OAuth provider credentials.
+    - Create an `oauth_config.php` file with your OAuth provider credentials. Refer to [Google OAuth Documentation](https://developers.google.com/identity/protocols/oauth2) for setup.
     ```php
     return [
         'google' => [
@@ -100,8 +106,14 @@ This file contains the client-side logic for:
 - Theme selection and background image upload
 - Drag-and-drop functionality for reordering tasks
 
+## Testing
+- Include instructions for running tests if applicable.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+- If you’d like to contribute, please open an issue or submit a pull request.
 
 ## Acknowledgments
 - Thanks to the [League OAuth2 Client](https://github.com/thephpleague/oauth2-client) for the OAuth integration.
