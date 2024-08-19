@@ -107,7 +107,48 @@ This file contains the client-side logic for:
 - Drag-and-drop functionality for reordering tasks
 
 ## Testing
-- Include instructions for running tests if applicable.
+
+### Adding a New Task
+
+1. **Open the TaskEase Application:**
+   - Navigate to `http://localhost:8000/todo_list` in your web browser.
+
+2. **Access the Add Task Modal:**
+   - Click the "Add Task" button, typically located at the bottom of the task list or in a prominent position.
+
+3. **Fill in the Task Details:**
+   - **Todo:** Enter a name or title for your task.
+   - **Priority:** Select the priority level (Low, Medium, High).
+   - **Due Date:** Choose a due date from the date picker.
+   - **Description:** Provide a brief description of the task.
+   - **Category:** Assign a category (e.g., Work, Personal).
+   - **Subtasks:** (Optional) Add any subtasks if needed.
+   - **Tags:** (Optional) Add tags to categorize the task further.
+   - **Attachment:** (Optional) Upload a file if necessary.
+
+4. **Submit the Form:**
+   - Click the "Add Task" button within the modal to submit the new task.
+
+5. **Verify the Task is Added:**
+   - Ensure that the task appears in the task list with the correct details after submission.
+
+6. **Check for Errors:**
+   - Look for any error messages or issues. If the task does not appear, verify the following:
+     - Check the `tasks` table in your MySQL database for the new entry.
+     - Ensure the form data is correctly processed.
+     - Review PHP and server error logs for any issues.
+
+### Additional Testing
+
+- **Test Task Editing:**
+  - Edit existing tasks to ensure that changes are saved and reflected correctly.
+
+- **Test Task Deletion:**
+  - Delete tasks and confirm that they are removed from the task list and database.
+
+- **Test OAuth Login:**
+  - Verify that OAuth logins (Google, GitHub, LinkedIn) work as expected.
+
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
