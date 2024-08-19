@@ -22,11 +22,17 @@ TaskEase is a comprehensive task management application designed to help users s
 - Switch between light and dark modes.
 - Upload custom background images.
 
+## Prerequisites
+
+- PHP 7.4 or higher
+- Composer
+- MySQL
+
 ## Installation
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/gidambayiantony/TaskEase.git
+    git clone https://github.com/your-username/TaskEase.git
     cd TaskEase
     ```
 
